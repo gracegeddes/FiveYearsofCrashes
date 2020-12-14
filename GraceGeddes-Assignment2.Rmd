@@ -1,0 +1,101 @@
+---
+title: "Five Years of Crashes in Victoria"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    source: embed
+    theme: yeti
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+<!-- Leafly Map for fatal accidents -->
+### Where are fatal accidents located?
+
+```{r}
+library(leaflet)
+library(dplyr)
+Crashes_Edited <- read.csv("~/R/Crashes_Edited.csv")
+accidents_fatal <- Crashes_Edited %>% filter(FATALITY > 0)
+leaflet(data = accidents_fatal) %>%
+  addTiles() %>%
+  addMarkers()
+```
+
+***
+
+Fatal accidents are scattered throughout the state, however as expected, the amount of incidents are slightly more dense within the metropolitan area.
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Discover.data.vic.gov.au
+
+<!-- Chart for most common accident types, ordering the accidents by most common to least -->
+### What are the most common form of accidents? {data-padding=50}
+
+```{r}
+library(plotly)
+Crashes_Edited <- read.csv("~/R/Crashes_Edited.csv")
+Crashes_Edited$ACCIDENT_TYPE <- factor(Crashes_Edited$ACCIDENT_TYPE,levels = c( "Collision with vehicle", "Collision with a fixed object","Struck Pedestrian","No collision and no object struck","Vehicle overturned (no collision)", "Struck animal","collision with some other object", "Fall from or in moving vehicle", "Other accident"))
+p <- ggplot(data = Crashes_Edited, aes(x = ACCIDENT_TYPE))+geom_bar() + facet_grid(rows = vars(STAT_DIV_NAME)) + ylab("Accident Count") + theme(axis.text.x = element_text(angle = 90), axis.title.x = element_blank(), axis.title.y = element_blank())
+ggplotly(p)
+```
+
+***
+
+Overall, the most common type of accident is a collision with a vehicle, with there being more of these collisions in the city. As expected, there are more collisions with pedestrians in the city.
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Discover.data.vic.gov.au
+
+<!-- Accidents sorted by year, not including 2019 as it was not a complete year -->
+### Has there been an increase in serious accidents?
+
+```{r}
+library(plotly)
+Crashes_Edited <- read.csv("~/R/Crashes_Edited.csv")
+Crashes_Non2019 <- Crashes_Edited %>% filter(ACCIDENT_YEAR < 2019)
+Crashes_Non2019$SEVERITY <- factor(Crashes_Non2019$SEVERITY,levels = c("Fatal accident", "Serious injury accident", "Other injury accident", "Non injury accident"))
+p1 <- ggplot(data = Crashes_Non2019, aes(x = SEVERITY, fill = SEVERITY)) + geom_bar() + facet_grid(~ ACCIDENT_YEAR) + theme(axis.text.x = element_blank(), axis.ticks = element_blank(), legend.title = element_blank(), axis.title.y = element_blank())+ scale_fill_manual(values = c("#2171b5", "#6baed6", "#bdd7e7","#eff3ff" ))
+ggplotly(p1)
+```
+
+***
+Initially there was an increase in all levels of accidents from 2013 - 2015. However, it appears that accidents in general are on a downward trend.
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Discover.data.vic.gov.au
+
+<style type="text/css">
+
+.sbframe-commentary {
+   font-size: 15px;
+
+</style>
